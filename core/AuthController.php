@@ -119,6 +119,9 @@ class AuthController extends Database
 
     }
 
+    /**
+     * @Authenticate the user then redirect to the home page if success
+     */
     public function loginUser()
     {
 
@@ -143,7 +146,7 @@ class AuthController extends Database
             }
 
         }else{
-            throw new Exception("Something went wrong!");
+            return false;
         }
 
     }

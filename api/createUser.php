@@ -14,16 +14,16 @@ $home = new HomeController();
 /**
  * @the condition is data from the ajax 
  */
-if(isset($_POST['fname']))
+if(isset($_POST['fname']) && isset($_POST['lname']) && isset($_POST['email']) && isset($_POST['password']))
 {
 
     if($home->registerUser(trim(htmlspecialchars($_POST['fname'])), trim(htmlspecialchars($_POST['lname'])), trim(htmlspecialchars($_POST['email'])), trim(htmlspecialchars($_POST['password']))))
     {
-        echo json_encode(["message" => "Successfully created student"]);
+        echo json_encode(["status"=>true,"message" => "Successfully created student"]);
     }else{
-        echo json_encode(["message" => "Failed to create student"]);
+        echo json_encode(["status"=>false,"message" => "Failed to create student"]);
     }
 
 }else{
-    throw new Exception("You can't access this page!");
+    echo json_encode(["status"=>false,"message" => "Unable to access this page"]);
 }
