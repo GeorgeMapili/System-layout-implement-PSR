@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 namespace Core;
+\session_start();
 
 use Includes\Database;
 use Ramsey\Uuid\Uuid;
@@ -84,6 +85,16 @@ class AuthController extends Database
     }
 
     /**
+     * @return string where its already hashed the password
+     */
+    public function passwordHash(): string
+    {
+        $this->password = \password_hash($this->password, PASSWORD_DEFAULT);
+
+        return $this->password;
+    }
+
+    /**
      * @return bool true if the user successfully created else return false
      */
     public function createUser(): bool
@@ -104,6 +115,35 @@ class AuthController extends Database
             return true;
         }else{
             return false;
+        }
+
+    }
+
+    public function loginUser()
+    {
+
+        $sql = "SELECT * FROM users WHERE user_email = :email";
+        $stmt = $this->connect()->prepare($sql);
+        $stmt->bindValue(":email", $this->email);
+        $result = $stmt->execute();
+
+        if($result)
+        {
+
+            while($user = $stmt->fetch(PDO::FETCH_ASSOC)){
+
+                if(\password_verify($this->password,$user['user_passwowrd'])){
+
+                    $_SESSION['user_info'] = $user;
+                    // Redirect to home page
+                    header("location:");
+                    exit;
+                }
+
+            }
+
+        }else{
+            throw new Exception("Something went wrong!");
         }
 
     }
