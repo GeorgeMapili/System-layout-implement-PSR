@@ -11,25 +11,21 @@ use Includes\Database;
 $db = new Database();
 
 /**
- * @the condition is data from the ajax 
+ * @the data from condition is from the ajax
  */
-if(isset($_POST['email']) && isset($_POST['password']))
-{   
+if (isset($_POST['email']) && isset($_POST['password'])) {
+    $first_name = trim(htmlspecialchars($_POST['first']));
+    $last_name = trim(htmlspecialchars($_POST['last']));
+    $email = trim(htmlspecialchars($_POST['email']));
+    $password = trim(htmlspecialchars($_POST['password']));
 
-    $first_name = trim(htmlspecialchars($_POST['first'])); 
-    $last_name = trim(htmlspecialchars($_POST['last'])); 
-    $email = trim(htmlspecialchars($_POST['email'])); 
-    $password = trim(htmlspecialchars($_POST['password'])); 
+    $auth = new AuthController($first_name, $last_name, $email, $password);
 
-    $auth = new AuthController($first_name,$last_name,$email,$password);
-
-    if($auth->loginUser())
-    {
+    if ($auth->loginUser()) {
         echo json_encode(["status"=>true,"message" => "Successfully authenticated"]);
-    }else{
+    } else {
         echo json_encode(["status"=>false,"message" => "Something went wrong"]);
     }
-
-}else{
+} else {
     echo json_encode(["status"=>false,"message" => "Unable to access this page"]);
 }

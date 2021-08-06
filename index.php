@@ -10,8 +10,7 @@ $dotenv->load();
 
 $home = new HomeController();
 
-$dispatcher = FastRoute\simpleDispatcher(function(FastRoute\RouteCollector $r) {
-
+$dispatcher = FastRoute\simpleDispatcher(function (FastRoute\RouteCollector $r) {
     global $home;
 
     $r->addRoute('GET', '/system/', $home->index());

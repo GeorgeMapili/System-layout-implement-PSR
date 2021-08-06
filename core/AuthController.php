@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 namespace Core;
+
 \session_start();
 
 use Includes\Database;
@@ -10,7 +11,6 @@ use Ramsey\Uuid\Uuid;
 
 class AuthController extends Database
 {
-
     private string $first_name;
     private string $last_name;
     private string $email;
@@ -29,14 +29,11 @@ class AuthController extends Database
      */
     public function validateFirstName(): string
     {
-
-        if(preg_match('~[0-9]+~', $this->first_name))
-        {
+        if (preg_match('~[0-9]+~', $this->first_name)) {
             return 'first_name_number_validation';
         }
         
         return '';
-
     }
 
     /**
@@ -44,14 +41,11 @@ class AuthController extends Database
      */
     public function validateLastName(): string
     {
-
-        if(preg_match('~[0-9]+~', $this->last_name))
-        {
+        if (preg_match('~[0-9]+~', $this->last_name)) {
             return 'last_name_number_validation';
         }
         
         return '';
-
     }
 
     /**
@@ -59,14 +53,11 @@ class AuthController extends Database
      */
     public function validateEmail(): string
     {
-
-        if(!filter_var($this->email, FILTER_VALIDATE_EMAIL))
-        {
+        if (!filter_var($this->email, FILTER_VALIDATE_EMAIL)) {
             return 'email_format_validation';
         }
 
         return '';
-
     }
 
     /**
@@ -74,14 +65,11 @@ class AuthController extends Database
      */
     public function validatePassword(): string
     {
-
-        if(strlen($this->password) < 5)
-        {
+        if (strlen($this->password) < 5) {
             return 'password_len_validation';
         }
 
         return '';
-
     }
 
     /**
@@ -99,24 +87,21 @@ class AuthController extends Database
      */
     public function createUser(): bool
     {
-
         $uuid = Uuid::uuid4();
 
         $sql = "INSERT INTO users(user_id, user_first_name, user_last_name,user_email,user_password)VALUES(:uid,:first,:last,:email,:password)";
         $stmt = $this->connect()->prepare($sql);
-        $stmt->bindValue(':uid',$uuid->toString());
+        $stmt->bindValue(':uid', $uuid->toString());
         $stmt->bindValue(':first', $this->first_name);
         $stmt->bindValue(':last', $this->last_name);
         $stmt->bindValue(':email', $this->email);
-        $stmt->bindValue(':password',$this->password);
+        $stmt->bindValue(':password', $this->password);
 
-        if($stmt->execute())
-        {
+        if ($stmt->execute()) {
             return true;
-        }else{
+        } else {
             return false;
         }
-
     }
 
     /**
@@ -124,31 +109,22 @@ class AuthController extends Database
      */
     public function loginUser()
     {
-
         $sql = "SELECT * FROM users WHERE user_email = :email";
         $stmt = $this->connect()->prepare($sql);
         $stmt->bindValue(":email", $this->email);
         $result = $stmt->execute();
 
-        if($result)
-        {
-
-            while($user = $stmt->fetch(PDO::FETCH_ASSOC)){
-
-                if(\password_verify($this->password,$user['user_passwowrd'])){
-
+        if ($result) {
+            while ($user = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                if (\password_verify($this->password, $user['user_passwowrd'])) {
                     $_SESSION['user_info'] = $user;
                     // Redirect to home page
                     header("location:");
                     exit;
                 }
-
             }
-
-        }else{
+        } else {
             return false;
         }
-
     }
-
 }
