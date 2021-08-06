@@ -18,7 +18,7 @@ class AuthController
 
     private $database;
 
-    public function __construct(string $first_name, string $last_name, string $email, string $password, $db)
+    public function __construct(string $first_name, string $last_name, string $email, string $password, Database $db)
     {
         $this->first_name = trim(\htmlspecialchars($first_name));
         $this->last_name = trim(\htmlspecialchars($last_name));

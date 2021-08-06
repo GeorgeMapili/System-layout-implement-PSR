@@ -51,7 +51,7 @@ class HomeController
             $this->errors[] .= $this->validation->validateFirstName();
         }
 
-        $this->auth = new AuthController($first_name, $last_name, $email, $password, new Database);
+        $this->auth = new AuthController($first_name, $last_name, $email, $password);
 
         if ($auth->createUser() == true) {
             return true;
