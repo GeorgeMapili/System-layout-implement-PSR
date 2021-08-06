@@ -9,77 +9,22 @@ namespace Core;
 use Includes\Database;
 use Ramsey\Uuid\Uuid;
 
-class AuthController extends Database
+class AuthController
 {
     private string $first_name;
     private string $last_name;
     private string $email;
     private string $password;
 
-    public function __construct(string $first_name, string $last_name, string $email, string $password)
+    private $database;
+
+    public function __construct(string $first_name, string $last_name, string $email, string $password, $db)
     {
-        $this->first_name = $first_name;
-        $this->last_name = $last_name;
-        $this->email = $email;
-        $this->password = $password;
-    }
-
-    /**
-     * @return string which stores into the array to printout the validations
-     */
-    public function validateFirstName(): string
-    {
-        if (preg_match('~[0-9]+~', $this->first_name)) {
-            return 'first_name_number_validation';
-        }
-        
-        return '';
-    }
-
-    /**
-     * @return string which stores into the array to printout the validations
-     */
-    public function validateLastName(): string
-    {
-        if (preg_match('~[0-9]+~', $this->last_name)) {
-            return 'last_name_number_validation';
-        }
-        
-        return '';
-    }
-
-    /**
-     * @return string which stores into the array to printout the validations
-     */
-    public function validateEmail(): string
-    {
-        if (!filter_var($this->email, FILTER_VALIDATE_EMAIL)) {
-            return 'email_format_validation';
-        }
-
-        return '';
-    }
-
-    /**
-     * @return string which stores into the array to printout the validations
-     */
-    public function validatePassword(): string
-    {
-        if (strlen($this->password) < 5) {
-            return 'password_len_validation';
-        }
-
-        return '';
-    }
-
-    /**
-     * @return string where its already hashed the password
-     */
-    public function passwordHash(): string
-    {
-        $this->password = \password_hash($this->password, PASSWORD_DEFAULT);
-
-        return $this->password;
+        $this->first_name = trim(\htmlspecialchars($first_name));
+        $this->last_name = trim(\htmlspecialchars($last_name));
+        $this->email = trim(\htmlspecialchars($email));
+        $this->password = trim(\htmlspecialchars($password));
+        $this->database = $db;
     }
 
     /**
@@ -90,7 +35,7 @@ class AuthController extends Database
         $uuid = Uuid::uuid4();
 
         $sql = "INSERT INTO users(user_id, user_first_name, user_last_name,user_email,user_password)VALUES(:uid,:first,:last,:email,:password)";
-        $stmt = $this->connect()->prepare($sql);
+        $stmt = $this->database->connect()->prepare($sql);
         $stmt->bindValue(':uid', $uuid->toString());
         $stmt->bindValue(':first', $this->first_name);
         $stmt->bindValue(':last', $this->last_name);
@@ -107,10 +52,10 @@ class AuthController extends Database
     /**
      * @Authenticate the user then redirect to the home page if success
      */
-    public function loginUser()
+    public function loginUser(): bool
     {
         $sql = "SELECT * FROM users WHERE user_email = :email";
-        $stmt = $this->connect()->prepare($sql);
+        $stmt = $this->database->connect()->prepare($sql);
         $stmt->bindValue(":email", $this->email);
         $result = $stmt->execute();
 
@@ -118,9 +63,9 @@ class AuthController extends Database
             while ($user = $stmt->fetch(PDO::FETCH_ASSOC)) {
                 if (\password_verify($this->password, $user['user_passwowrd'])) {
                     $_SESSION['user_info'] = $user;
-                    // Redirect to home page
-                    header("location:");
-                    exit;
+                    return true;
+                }else{
+                    return false;
                 }
             }
         } else {

@@ -6,9 +6,7 @@ header("Content-Type: application/json; charset=UTF-8");
 require_once "../vendor/autoload.php";
 
 use Core\HomeController;
-use Includes\Database;
 
-$db = new Database();
 $home = new HomeController();
 
 /**

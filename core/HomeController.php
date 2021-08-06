@@ -4,17 +4,20 @@ declare(strict_types=1);
 
 namespace Core;
 
+use Includes\Database;
+
 class HomeController
 {
     private array $errors;
+    private $auth;
+    private $validation;
 
     /**
      * @custom view but in the further development plan to create a different
      */
     public function index(): void
     {
-        require_once __DIR__. "/../views/home.php";
-        exit;
+        // Handle views
     }
 
     /**
@@ -22,29 +25,33 @@ class HomeController
      */
     public function registerView(): void
     {
-        require_once __DIR__. "/../views/signup.php";
-        exit;
+        // Handles views
     }
 
-    public function registerUser(): bool
+    /**
+     * Initialize properties and dependency injection
+     */
+    public function registerUser($first_name, $last_name, $email, $password): bool
     {
-        $auth = new AuthController($_REQUEST['first_name'], $_REQUEST['last_name'], $_REQUEST['email'], $_REQUEST['password']);
+        $this->validation = new ValidationController($first_name, $last_name, $email, $password); 
         
-        if ($auth->validateFirstName() == "first_name_number_validation") {
-            $this->errors[] .= $auth->validateFirstName();
+        if ($this->validation->validateFirstName() == "first_name_number_validation") {
+            $this->errors[] .= $this->validation->validateFirstName();
         }
 
-        if ($auth->validateLastName() == "last_name_number_validation") {
-            $this->errors[] .= $auth->validateFirstName();
+        if ($this->validation->validateLastName() == "last_name_number_validation") {
+            $this->errors[] .= $this->validation->validateFirstName();
         }
 
-        if ($auth->validateEmail() == "email_format_validation") {
-            $this->errors[] .= $auth->validateFirstName();
+        if ($this->validation->validateEmail() == "email_format_validation") {
+            $this->errors[] .= $this->validation->validateFirstName();
         }
 
-        if ($auth->validateEmail() == "password_len_validation") {
-            $this->errors[] .= $auth->validateFirstName();
+        if ($this->validation->validateEmail() == "password_len_validation") {
+            $this->errors[] .= $this->validation->validateFirstName();
         }
+
+        $this->auth = new AuthController($first_name, $last_name, $email, $password, new Database);
 
         if ($auth->createUser() == true) {
             return true;

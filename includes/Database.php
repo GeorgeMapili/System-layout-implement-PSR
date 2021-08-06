@@ -9,7 +9,7 @@ use PDOException;
 
 class Database
 {
-    private $con;
+    public $con;
 
     public function connect(): object
     {
