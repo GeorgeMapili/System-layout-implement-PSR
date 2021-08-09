@@ -13,13 +13,16 @@ $router->setBasePath('/system');
 $router->map('GET', '/', 'HomeController#index');
 $router->map('GET', '/about', 'HomeController#about');
 
-
-// map user details page
-$router->map('GET', '/user/[i:id]/', function ($id) {
-    require __DIR__ . '/views/user-details.php';
+$router->map('GET', '/order', function () {
+    require __DIR__ . '/views/order.php';
 });
 
 $match = $router->match();
+
+if ($match === false) {
+    header($_SERVER["SERVER_PROTOCOL"] . ' 404 Not Found');
+    exit;
+}
 
 if (is_string($match['target'])) {
     list($controller, $action) = explode('#', $match['target']) ;

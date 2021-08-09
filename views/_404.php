@@ -1,3 +1,3 @@
 <?php require_once(__DIR__. "/layouts/header.php") ?>
-    <h1>About page</h1>
+    <h1>Page not Found</h1>
 <?php require_once(__DIR__. "/layouts/footer.php") ?>
