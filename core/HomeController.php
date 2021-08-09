@@ -2,22 +2,30 @@
 
 declare(strict_types=1);
 
-namespace Core;
+// namespace Core;
 
-use Includes\Database;
+// use Includes\Database;
+use Core\View\Route;
 
 class HomeController
 {
     private array $errors;
     private $auth;
     private $validation;
+    private $router;
 
-    /**
-     * @custom view but in the further development plan to create a different
-     */
-    public function index(): void
+    public function __construct(Route $router){
+        $this->router = $router;
+    }
+
+    public function index()
     {
-        // Handle views
+        $this->router::view('home');
+    }
+
+    public function about()
+    {
+        $this->router::view('about');
     }
 
     /**
@@ -28,12 +36,9 @@ class HomeController
         // Handles views
     }
 
-    /**
-     * Initialize properties and dependency injection
-     */
     public function registerUser($first_name, $last_name, $email, $password): bool
     {
-        $this->validation = new ValidationController($first_name, $last_name, $email, $password); 
+        $this->validation = new ValidationController($first_name, $last_name, $email, $password);
         
         if ($this->validation->validateFirstName() == "first_name_number_validation") {
             $this->errors[] .= $this->validation->validateFirstName();

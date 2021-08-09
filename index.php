@@ -1,49 +1,37 @@
 <?php
 
-require_once __DIR__ . '/vendor/autoload.php';
-
+require_once __DIR__ . "/vendor/autoload.php";
+require_once __DIR__. '/core/HomeController.php';
 use Core\HomeController;
-use Core\AuthController;
+use Core\View\Route;
 
-$dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
-$dotenv->load();
+$router = new AltoRouter();
 
-$home = new HomeController();
+$router->setBasePath('/system');
 
-$dispatcher = FastRoute\simpleDispatcher(function (FastRoute\RouteCollector $r) {
-    global $home;
+// Routing
+$router->map('GET', '/', 'HomeController#index');
+$router->map('GET', '/about', 'HomeController#about');
 
-    $r->addRoute('GET', '/system/', $home->index());
-    $r->addRoute('GET', '/system/signup', $home->registerView());
-    $r->addRoute('POST', '/system/signup', $home->registerUser());
-    // {id} must be a number (\d+)
-    $r->addRoute('GET', '/user/{id:\d+}', 'get_user_handler');
-    // The /{title} suffix is optional
-    $r->addRoute('GET', '/articles/{id:\d+}[/{title}]', 'get_article_handler');
+
+// map user details page
+$router->map('GET', '/user/[i:id]/', function ($id) {
+    require __DIR__ . '/views/user-details.php';
 });
 
-// Fetch method and URI from somewhere
-$httpMethod = $_SERVER['REQUEST_METHOD'];
-$uri = $_SERVER['REQUEST_URI'];
+$match = $router->match();
 
-// Strip query string (?foo=bar) and decode URI
-if (false !== $pos = strpos($uri, '?')) {
-    $uri = substr($uri, 0, $pos);
+if (is_string($match['target'])) {
+    list($controller, $action) = explode('#', $match['target']) ;
 }
-$uri = rawurldecode($uri);
 
-$routeInfo = $dispatcher->dispatch($httpMethod, $uri);
-switch ($routeInfo[0]) {
-    case FastRoute\Dispatcher::NOT_FOUND:
-        // ... 404 Not Found
-        break;
-    case FastRoute\Dispatcher::METHOD_NOT_ALLOWED:
-        $allowedMethods = $routeInfo[1];
-        // ... 405 Method Not Allowed
-        break;
-    case FastRoute\Dispatcher::FOUND:
-        $handler = $routeInfo[1];
-        $vars = $routeInfo[2];
-        // ... call $handler with $vars
-        break;
+// call closure or throw 404 status
+if (is_string($match['target']) && is_callable($controller, $action)) {
+    $obj = new $controller(new Route());
+    call_user_func_array(array($obj,$action), array($match['params']));
+} elseif (is_array($match) && is_callable($match['target'])) {
+    call_user_func_array($match['target'], $match['params']);
+} else {
+    // no route was matched
+    header($_SERVER["SERVER_PROTOCOL"] . ' 404 Not Found');
 }
