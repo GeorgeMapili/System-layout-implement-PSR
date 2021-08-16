@@ -5,6 +5,8 @@ const email = document.querySelector("#email")
 const password = document.querySelector("#password")
 const confirm_password = document.querySelector("#confirm_password")
 
+let inputs = [first_name, last_name, email, password, confirm_password]
+
 function validateName(input, element){
     const regex = /^[a-zA-Z ]{2,30}$/
     
@@ -91,71 +93,33 @@ confirm_password.addEventListener("keyup", e => {
     validateConfirmPassword(e.target.value, confirm_password)
 });
 
-// function required_field(element){
 
-//     let messages = []
+function required_fields(elements){
 
-//     element.forEach(el => {
-//         if(el.value === '' || el.value == null){
-//             messages.push(el.name.charAt(0).toUpperCase() + el.name.slice(1).replace("_", " ")+ " is required")
-//         }
-//     });
+    elements.forEach(element => {
+        validate_input(element.value, element);
+    });
 
-//     return messages
-// }
+}
 
-// function display_message(message){
+function validate_input(input, element){
+    
+    if(input == ""){
+        const prnt = element.parentNode
+        const input_field = prnt.querySelector('input');
+        const small = prnt.querySelector('small')
+        input_field.className = 'form-control is-invalid'
+        small.innerHTML = element.name.charAt(0).toUpperCase() + element.name.slice(1).replace("_", " ")+ " is required"
+        small.className = 'text-danger'
+    }
+    
+}
 
-//     message.forEach(element => {
-//         if(element == "First name is required"){
-//             const small = document.createElement('small')
-//             small.innerText = ''
-//             small.classList.add('text-danger')
-//             small.innerHTML = element
+form.addEventListener("submit", (e) => {
 
-//             first_name.classList.add('is-invalid')
-//             const parent = first_name.parentNode
-//             parent.append(small)
-//         }else if(element == "Last name is required"){
-//             const small = document.createElement('small')
-//             small.classList.add('text-danger')
-//             small.innerHTML = element
+    e.preventDefault()
+    
+    required_fields(inputs)
 
-//             last_name.classList.add('is-invalid')
-//             const parent = last_name.parentNode
-//             parent.append(small)
-//         }
-//     });
 
-// }
-
-// function success_validation(message){
-
-//     message.forEach(element => {
-
-//         if(element != "First name is required")
-
-//         first_name.classList.add('is-valid');
-//         last_name.classList.add('is-valid');
-//         email.classList.add('is-valid');
-//         password.classList.add('is-valid');
-//         confirm_password.classList.add('is-valid');
-
-//     });
-
-// }
-
-// form.addEventListener("submit", (e) => {
-
-//     e.preventDefault()
-
-//     const message = required_field(input_field)
-
-//     if(message.length > 0){
-//         display_message(message)
-//     }else{
-//         success_validation(message);
-//     }
-
-// });
-
+});
