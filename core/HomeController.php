@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-// namespace Core;
+namespace Core;
 
-// use Includes\Database;
+use Includes\Database;
 use Core\View\Route;
 
 class HomeController
@@ -14,7 +14,8 @@ class HomeController
     private $validation;
     private $router;
 
-    public function __construct(Route $router){
+    public function __construct(Route $router)
+    {
         $this->router = $router;
     }
 
@@ -33,7 +34,7 @@ class HomeController
      */
     public function registerView(): void
     {
-        // Handles views
+        $this->router::view('register');
     }
 
     public function registerUser($first_name, $last_name, $email, $password): bool

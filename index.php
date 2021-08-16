@@ -1,7 +1,7 @@
 <?php
 
 require_once __DIR__ . "/vendor/autoload.php";
-require_once __DIR__. '/core/HomeController.php';
+// require_once __DIR__. '/core/HomeController.php';
 use Core\HomeController;
 use Core\View\Route;
 
@@ -12,6 +12,7 @@ $router->setBasePath('/system');
 // Routing
 $router->map('GET', '/', 'HomeController#index');
 $router->map('GET', '/about', 'HomeController#about');
+$router->map('GET', '/register', 'HomeController#registerView');
 
 $router->map('GET', '/order', function () {
     require __DIR__ . '/views/order.php';
@@ -30,6 +31,7 @@ if (is_string($match['target'])) {
 
 // call closure or throw 404 status
 if (is_string($match['target']) && is_callable($controller, $action)) {
+    $controller = 'Core\\'. $controller;
     $obj = new $controller(new Route());
     call_user_func_array(array($obj,$action), array($match['params']));
 } elseif (is_array($match) && is_callable($match['target'])) {
