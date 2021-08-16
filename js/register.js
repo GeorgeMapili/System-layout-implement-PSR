@@ -91,9 +91,6 @@ confirm_password.addEventListener("keyup", e => {
     validateConfirmPassword(e.target.value, confirm_password)
 });
 
-
-// let input_field = [first_name, last_name, email, password, confirm_password]
-
 // function required_field(element){
 
 //     let messages = []
