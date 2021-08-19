@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Includes;
 
+require_once $_SERVER['DOCUMENT_ROOT']. '/system/vendor/autoload.php';
+\Dotenv\Dotenv::createImmutable($_SERVER['DOCUMENT_ROOT']. '/system')->load();
+
 use PDO;
 use PDOException;
 

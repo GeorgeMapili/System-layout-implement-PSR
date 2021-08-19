@@ -11,6 +11,12 @@ class ValidationController
     private string $email;
     private string $password;
 
+    /**
+     * @param string first_name
+     * @param string last_name
+     * @param string email
+     * @param string password
+     */
     public function __construct(string $first_name, string $last_name, string $email, string $password)
     {
         $this->first_name = $first_name;
@@ -60,21 +66,10 @@ class ValidationController
      */
     public function validatePassword(): string
     {
-        if (strlen($this->password) < 5) {
+        if (strlen($this->password) < 8) {
             return 'password_len_validation';
         }
 
         return '';
     }
-
-    /**
-     * @return string where its already hashed the password
-     */
-    public function passwordHash(): string
-    {
-        $this->password = \password_hash($this->password, PASSWORD_DEFAULT);
-
-        return $this->password;
-    }
-
 }

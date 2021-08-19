@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Core;
 
+require_once( $_SERVER['DOCUMENT_ROOT']. "/system/vendor/autoload.php");
+
 \session_start();
 
 use Includes\Database;
@@ -16,6 +18,7 @@ class AuthController
     private string $email;
     private string $password;
     private $database;
+    private $errors = array();
 
     /**
      * @param string $first_name The string input first_name from the user
@@ -38,18 +41,28 @@ class AuthController
      */
     public static function sanitizeInput(string $input): string
     {
-        return trim(\htmlspecialchars($input, ENT_QUOTES, UTF-8));
+        return trim(\htmlspecialchars($input, ENT_QUOTES));
+    }
+
+    
+    /**
+     * @return string where its already hashed the password
+     */
+    public function passwordHash(): string
+    {
+        $this->password = \password_hash($this->password, PASSWORD_DEFAULT);
+
+        return $this->password;
     }
 
     /**
-     * @return bool true when the user successfully created
-     * @return bool false when something went wrong
+     * @return bool true when the user successfully created && false when something went wrong
      */
     public function createUser(): bool
     {
         $uuid = Uuid::uuid4();
 
-        $sql = "INSERT INTO users(user_id, user_first_name, user_last_name,user_email,user_password)VALUES(:uid,:first,:last,:email,:password)";
+        $sql = "INSERT INTO users(id, first_name, last_name, email, password)VALUES(:uid,:first,:last,:email,:password)";
         $stmt = $this->database->connect()->prepare($sql);
         $stmt->bindValue(':uid', $uuid->toString());
         $stmt->bindValue(':first', $this->first_name);
@@ -85,6 +98,50 @@ class AuthController
                 }
             }
         } else {
+            return false;
+        }
+    }
+
+    /**
+     * @param string first_name
+     * @param string last_name
+     * @param string email
+     * @param string password
+     * @return bool true or false
+     */
+    public function registerUser(string $first_name, string $last_name, string $email, string $password): bool
+    {
+        $this->validation = new ValidationController($first_name, $last_name, $email, $password);
+        
+        if ($this->validation->validateFirstName() == "first_name_number_validation") {
+            $this->errors[] = $this->validation->validateFirstName();
+        }
+
+        if ($this->validation->validateLastName() == "last_name_number_validation") {
+            $this->errors[] = $this->validation->validateLastName();
+        }
+
+        if ($this->validation->validateEmail() == "email_format_validation") {
+            $this->errors[] = $this->validation->validateEmail();
+        }
+
+        if ($this->validation->validatePassword() == "password_len_validation") {
+            $this->errors[] = $this->validation->validatePassword();
+        }
+
+        if (empty($this->errors)) {
+            $this->passwordHash();
+
+            if ($this->createUser() === true) {
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            foreach ($this->errors as $data) {
+                unset($this->errors[$data]);
+            }
+
             return false;
         }
     }

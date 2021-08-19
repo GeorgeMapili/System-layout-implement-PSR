@@ -7,6 +7,12 @@
         </div>
         <div class="card-body">
             <form id="register">
+                <div id="message" class="text-center">
+                    <div class="alert alert-success alert-dismissible fade show" id="alert-btn" role="alert" hidden>
+                        <strong id="message_strong"></strong>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                </div>
                 <div class="mb-3">
                     <label for="first_name" class="form-label">First Name</label>
                     <input type="text" class="form-control" id="first_name" name="first_name">
