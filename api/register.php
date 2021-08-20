@@ -19,21 +19,23 @@ if ($_SERVER['REQUEST_METHOD'] === "POST") {
 
     $auth = new AuthController($first_name, $last_name, $email, $password, $db);
 
-    if(!empty($first_name) && !empty($last_name) && !empty($email) && !empty($password)){
-
-        if ($auth->registerUser($first_name, $last_name, $email, $password)) {
-            http_response_code(200);
-            echo json_encode(["status"=>true,"message" => "Successfully created student"]);
+    if (!empty($first_name) && !empty($last_name) && !empty($email) && !empty($password)) {
+        if (!$auth->check_email()) {
+            if ($auth->registerUser()) {
+                http_response_code(200);
+                echo json_encode(["status"=>true,"message" => "Successfully created student"]);
+            } else {
+                http_response_code(400);
+                echo json_encode(["status"=>false,"message" => "Failed to create student"]);
+            }
         } else {
             http_response_code(400);
-            echo json_encode(["status"=>false,"message" => "Failed to create student"]);
+            echo json_encode(["status"=>false,"message" => "Email already existed"]);
         }
-
-    }else{
-        http_response_code(404);
-        echo json_encode(["status"=>false,"message" => "All values needed"]);
+    } else {
+        http_response_code(400);
+        echo json_encode(["status"=>false,"message" => "Require all fields"]);
     }
-
 } else {
     http_response_code(503);
     echo json_encode(["status"=>false,"message" => "Access denied"]);

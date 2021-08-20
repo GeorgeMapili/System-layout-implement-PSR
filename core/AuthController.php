@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace Core;
 
-require_once( $_SERVER['DOCUMENT_ROOT']. "/system/vendor/autoload.php");
+require_once($_SERVER['DOCUMENT_ROOT']. "/system/vendor/autoload.php");
 
 \session_start();
 
 use Includes\Database;
 use Ramsey\Uuid\Uuid;
+use PDO;
 
 class AuthController
 {
@@ -27,13 +28,19 @@ class AuthController
      * @param string $password The string input password from the user
      * @param Database Dependency injection to the db connection
      */
-    public function __construct(string $first_name, string $last_name, string $email, string $password, Database $db)
+    public function __construct(?string $first_name, ?string $last_name, string $email, string $password, Database $db)
     {
-        $this->first_name = self::sanitizeInput($first_name);
-        $this->last_name = self::sanitizeInput($last_name);
-        $this->email = self::sanitizeInput($email);
-        $this->password = self::sanitizeInput($password);
-        $this->database = $db;
+        if (\is_null($first_name) && \is_null($last_name)):
+            $this->email = self::sanitizeInput($email);
+            $this->password = self::sanitizeInput($password);
+            $this->database = $db; 
+        else:
+            $this->first_name = self::sanitizeInput($first_name);
+            $this->last_name = self::sanitizeInput($last_name);
+            $this->email = self::sanitizeInput($email);
+            $this->password = self::sanitizeInput($password);
+            $this->database = $db;
+        endif;
     }
 
     /**
@@ -53,6 +60,21 @@ class AuthController
         $this->password = \password_hash($this->password, PASSWORD_DEFAULT);
 
         return $this->password;
+    }
+
+    public function check_email(): bool
+    {
+        $query = "SELECT * FROM users WHERE email = :email";
+
+        $stmt = $this->database->connect()->prepare($query);
+        $stmt->bindParam(":email", $this->email, PDO::PARAM_STR);
+        $stmt->execute();
+
+        if ($stmt->rowCount() > 0) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     /**
@@ -81,18 +103,18 @@ class AuthController
      * @return bool true when the user then redirect to the home page if success
      * @return bool false when the user input incorrect credentials or something went wrong
      */
-    public function loginUser(): bool
+    public function loginUser()
     {
-        $sql = "SELECT * FROM users WHERE user_email = :email";
+        $sql = "SELECT * FROM users WHERE email = :email";
         $stmt = $this->database->connect()->prepare($sql);
         $stmt->bindValue(":email", $this->email);
-        $result = $stmt->execute();
+        $stmt->execute();
 
-        if ($result) {
+        if ($stmt->rowCount() > 0) {
             while ($user = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                if (\password_verify($this->password, $user['user_passwowrd'])) {
+                if (\password_verify($this->password, $user['password'])) {
                     $_SESSION['user_info'] = $user;
-                    return true;
+                    return $user;
                 } else {
                     return false;
                 }
@@ -109,7 +131,7 @@ class AuthController
      * @param string password
      * @return bool true or false
      */
-    public function registerUser(string $first_name, string $last_name, string $email, string $password): bool
+    public function registerUser(): bool
     {
         $this->validation = new ValidationController($first_name, $last_name, $email, $password);
         
