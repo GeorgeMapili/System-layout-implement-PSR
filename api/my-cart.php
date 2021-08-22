@@ -10,6 +10,8 @@ use Core\CartController;
 use Includes\Database;
 use Firebase\JWT\JWT;
 
+\Dotenv\Dotenv::createImmutable($_SERVER['DOCUMENT_ROOT']. '/system')->load();
+
 $db = new Database();
 
 $cart = new CartController($db);
@@ -20,7 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] === "GET") {
     try {
         $jwt = $headers['Authorization'];
 
-        $secret_key = "owt125";
+        $secret_key = $_ENV['JWT_SECRET_KEY'];
     
         $decoded_data = JWT::decode($jwt, $secret_key, array('HS256'));
     

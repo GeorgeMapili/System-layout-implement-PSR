@@ -10,6 +10,8 @@ use Core\AuthController;
 use Includes\Database;
 use Firebase\JWT\JWT;
 
+\Dotenv\Dotenv::createImmutable($_SERVER['DOCUMENT_ROOT']. '/system')->load();
+
 $db = new Database();
 
 /**
@@ -34,7 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] === "POST") {
                 "id" => $data['id']
             );
 
-            $secret_key = "owt125";
+            $secret_key = $_ENV['JWT_SECRET_KEY'];
 
             $payload_info = array(
                 "iss" => $iss,
