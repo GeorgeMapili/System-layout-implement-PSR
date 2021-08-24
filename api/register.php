@@ -2,7 +2,7 @@
 
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
-header("Access-Control-ALlow-Methods: POST");
+header("Access-Control-Allow-Methods: POST");
 
 require_once $_SERVER['DOCUMENT_ROOT']. '/system/vendor/autoload.php';
 

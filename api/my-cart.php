@@ -2,7 +2,7 @@
 
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
-header("Access-Control-ALlow-Methods: GET");
+header("Access-Control-Allow-Methods: GET");
 
 require_once $_SERVER['DOCUMENT_ROOT']. '/system/vendor/autoload.php';
 
