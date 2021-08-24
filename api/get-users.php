@@ -9,6 +9,8 @@ require_once $_SERVER['DOCUMENT_ROOT']. '/system/vendor/autoload.php';
 use Core\UserController;
 use Includes\Database;
 
+\Dotenv\Dotenv::createImmutable($_SERVER['DOCUMENT_ROOT']. '/system')->load();
+
 $db = new Database();
 
 $user = new UserController($db);
@@ -16,9 +18,9 @@ $user = new UserController($db);
 if ($_SERVER['REQUEST_METHOD'] === "GET") {
 
     $page = (int) htmlspecialchars(strip_tags($_GET['page']));
-    $row_per_page = 4;
+    $row_per_page = $_ENV['ROW_PER_PAGE'];
 
-    $table_name = "users";
+    $table_name = $_ENV['TABLE_NAME_USERS'];
 
     if(!empty($page) && is_int($page)){
         try {
