@@ -35,7 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] === "GET") {
                 echo json_encode(["status"=>false,"message" => "No user found"]);
             }
         } catch (\Exception $e) {
-            http_response_code(400);
+            http_response_code(400); 
             echo json_encode(["status"=>false,"message" => "Invalid page parameter"]);
         }
     }else{
